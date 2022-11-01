@@ -8,6 +8,7 @@ const readline = require('readline').createInterface({
 })
 const p = path.join( __dirname, 'text.txt');
 
+
 fs.access(p, (err) => { // проверка есть ли файл?
   if (err) {
     writeText(`New file will be created. Please write text below: \n`)
@@ -22,21 +23,6 @@ function checkExit(text) { // проверка вводит ли пользов�
     process.exit();
 }
 }
-
-
-// function write(caption) {
-
-//   fs.createWriteStream(p);
-//   readline.question(caption, (text) => {
-//     checkExit(text);
-
-//     fs.appendFile(p, text, function (err) {
-//       if (err) throw err;
-//       console.log('Saved!');
-//     });
-//     })
-// }
-
   process.on('beforeExit', (code) => {
     console.log('See you later!');
   });
