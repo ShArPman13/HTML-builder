@@ -8,12 +8,15 @@ const readline = require('readline').createInterface({
 })
 const p = path.join( __dirname, 'text.txt');
 
+fs.open(p, 'w', (err) => {
+  if(err) throw err;
+});
 
 fs.access(p, (err) => { // проверка есть ли файл?
   if (err) {
-    writeText(`New file will be created. Please write text below: \n`)
+    writeText(`New file has been created. Please write text below: \n`)
   } else {
-    writeText(`File is already exist. Please write text below: \n`)
+    writeText(`File is already exist and cleared. Please write text below: \n`)
   }
 });
 
