@@ -1,7 +1,7 @@
 const fs = require('fs');
 const fsProm = require('fs/promises');
 const path = require('path');
-const paint = require('chalk');
+// const paint = require('chalk');
 
 const way = path.join(__dirname + '/secret-folder');
 
@@ -21,8 +21,8 @@ async function readDir() {
       }
   }
   if (count === 0) {
-    console.log(paint.yellow('No files in the directory'));
-  } else console.log(paint.yellow(`There are ${count} files in folder`));
+    console.log('No files in the directory');
+  } else console.log(`There are ${count} files in folder`);
 };
 
 readDir();
