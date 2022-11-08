@@ -1,5 +1,4 @@
 const fs = require('fs');
-// const paint = require('chalk');
 const fsProm = require('fs/promises');
 const path = require('path');
 
@@ -24,8 +23,6 @@ async function readTemplate(obj) {
       start = i;
     } else if (template[i] && template[i + 1] === '}') {
         let end = i + 2;
-        // length = end - start ;
-
         for (let el in obj) {
           if (template.slice(start, end) === el) {
             template = template.substring(0, start) + obj[el] + template.substring(end, template.length);
@@ -90,32 +87,17 @@ async function readStyleFile(file) {
   return fileContent;
 }
 
-async function writeFile(s) {
-  await fsProm.appendFile(wayAllStyles, s + '\n');
-}
-
 async function getAllStyles() {
   await readDir(); // read styles DIR and get styleArray for BUNDLE
-
-  fsProm.access(wayAllStyles)
-    .then(async () => {
-      await fsProm.unlink(wayAllStyles); // if BUNDLE already exists - remove it first
-      for (let style of styleArray) {
-        await writeFile(style);
-      }
-    })
-    .catch(async () => {
-      for (let style of styleArray) {
-        await writeFile(style);
-      }
-    });
+  for (let style of styleArray) {
+    await fsProm.appendFile(wayAllStyles, style + '\n');
+  }
 }
 
 async function getStyles() {
 
   await makeHTML();
   await getAllStyles();
-
 
   await fsProm.mkdir(wayAssetsNew, {recursive: true});
   copyDir(wayAssetsOld, wayAssetsNew)
@@ -134,9 +116,4 @@ async function copyDir(wayOld, wayNew) {
               copyDir(wayAssetsOld + '/' + item, wayAssetsNew + '/' + item)
         }
   }
-}
-
-async function deleteDir(wayNew) {
-  await fsProm.rm(wayNew, { recursive: true, force: true });
-  fsProm.mkdir(wayNew, {recursive: true});
 }
