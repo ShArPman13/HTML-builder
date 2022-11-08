@@ -24,7 +24,7 @@ async function readTemplate(obj) {
       start = i;
     } else if (template[i] && template[i + 1] === '}') {
         let end = i + 2;
-        length = end - start ;
+        // length = end - start ;
 
         for (let el in obj) {
           if (template.slice(start, end) === el) {
@@ -116,15 +116,9 @@ async function getStyles() {
   await makeHTML();
   await getAllStyles();
 
-  fs.access(wayAssetsNew, async (err) => { // is folder exist?
-    if (err && err.code === 'ENOENT') {
-      await fsProm.mkdir(wayAssetsNew, {recursive: true});
-      copyDir(wayAssetsOld, wayAssetsNew)
-    } else {
-        await deleteDir(wayAssetsNew);
-        copyDir(wayAssetsOld, wayAssetsNew);
-    }
-  })
+
+  await fsProm.mkdir(wayAssetsNew, {recursive: true});
+  copyDir(wayAssetsOld, wayAssetsNew)
 }
 //-----------------------------------------------------------------from task5---get styles.css in DIST--------
 getStyles();
