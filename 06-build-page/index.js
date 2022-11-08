@@ -65,47 +65,31 @@ async function checkDistDirectory() {
 async function makeHTML() {
   const objectAllComp = await findAllComponents();
   const fullTemplate = await readTemplate(objectAllComp);
-  await checkDistDirectory();
   await fsProm.appendFile(wayNewIndex, fullTemplate + '\n');
 }
-//-----------------------------------------------------------------from task5---get styles.css in DIST--------
-let styleArray = [];
 
-async function readDir() { // read DIR with styles
+async function readStylesDir() { // read DIR with styles
+  let styleArray = [];
   const files = await fsProm.readdir(wayStyles); // all files in DIR here
   for (let item of files) {
     const st = await fsProm.stat(wayStyles + '/'+ item) // get stats for each file in DIR
       if (st.isFile() && path.extname(item) === '.css') { // check is it .css file?
-        await readStyleFile(item);
+        const fileContent = await fsProm.readFile(wayStyles + '/' + item, {encoding: 'utf8'});
+        styleArray.push(fileContent);
       }
   }
+  return styleArray;
 };
 
-async function readStyleFile(file) {
-  const fileContent = await fsProm.readFile(wayStyles + '/' + file, {encoding: 'utf8'});
-  styleArray.push(fileContent);
-  return fileContent;
-}
-
 async function getAllStyles() {
-  await readDir(); // read styles DIR and get styleArray for BUNDLE
-  for (let style of styleArray) {
+  const allStyles = await readStylesDir(); // read styles DIR and get styleArray for BUNDLE
+  for await (let style of allStyles) {
     await fsProm.appendFile(wayAllStyles, style + '\n');
   }
 }
 
-async function getStyles() {
-
-  await makeHTML();
-  await getAllStyles();
-
+async function copyAssets(wayOld, wayNew) {
   await fsProm.mkdir(wayAssetsNew, {recursive: true});
-  copyDir(wayAssetsOld, wayAssetsNew)
-}
-//-----------------------------------------------------------------from task5---get styles.css in DIST--------
-getStyles();
-
-async function copyDir(wayOld, wayNew) {
   const files = await fsProm.readdir(wayOld);
   for (let item of files) {
     const st = await fsProm.stat(wayOld + '/'+ item)
@@ -113,7 +97,16 @@ async function copyDir(wayOld, wayNew) {
         await fsProm.copyFile(wayOld + '/' + item, wayNew + '/' + item)
       } else if  (st.isDirectory()) {
               await fsProm.mkdir(wayNew + '/' + item, {recursive: true});
-              copyDir(wayAssetsOld + '/' + item, wayAssetsNew + '/' + item)
+              copyAssets(wayAssetsOld + '/' + item, wayAssetsNew + '/' + item)
         }
   }
 }
+
+async function getProjectDist() {
+  await checkDistDirectory();
+  await makeHTML();
+  await getAllStyles();
+  await copyAssets(wayAssetsOld, wayAssetsNew)
+}
+getProjectDist();
+
