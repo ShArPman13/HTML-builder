@@ -15,7 +15,6 @@ const wayAssetsNew = path.join(__dirname + '/project-dist/assets');
 const wayAssetsOld = path.join(__dirname + '/assets');
 
 
-
 async function readTemplate(obj) {
   const fileContent = await fsProm.readFile(wayTemplate, {encoding: 'utf8'});
   let template = fileContent;
@@ -37,8 +36,6 @@ async function readTemplate(obj) {
   return template;
 }
 
-
-
 async function findAllComponents() {
   let compObject = {};
   const components = await fsProm.readdir(wayComponents);
@@ -57,21 +54,23 @@ async function readFile(file) {
   return fileContent;
 }
 
+async function checkDistDirectory() {
+  try {
+    await fsProm.access(wayDist);
+    await fsProm.rm(wayDist, { recursive: true, force: true });
+    await fsProm.mkdir(wayDist, {recursive: true});
+  }
+  catch {
+    await fsProm.mkdir(wayDist, {recursive: true});
+  }
+}
+
 async function makeHTML() {
   const objectAllComp = await findAllComponents();
   const fullTemplate = await readTemplate(objectAllComp);
-  await fsProm.mkdir(wayDist, {recursive: true});
-
-  fsProm.access(wayNewIndex)
-  .then(async () => {
-    await fsProm.unlink(wayNewIndex);
-    await fsProm.appendFile(wayNewIndex, fullTemplate + '\n');
-    })
-  .catch(async () => {
-    await fsProm.appendFile(wayNewIndex, fullTemplate + '\n');
-    })
+  await checkDistDirectory();
+  await fsProm.appendFile(wayNewIndex, fullTemplate + '\n');
 }
-
 //-----------------------------------------------------------------from task5---get styles.css in DIST--------
 let styleArray = [];
 
@@ -113,8 +112,19 @@ async function getAllStyles() {
 }
 
 async function getStyles() {
+
   await makeHTML();
   await getAllStyles();
+
+  fs.access(wayAssetsNew, async (err) => { // is folder exist?
+    if (err && err.code === 'ENOENT') {
+      await fsProm.mkdir(wayAssetsNew, {recursive: true});
+      copyDir(wayAssetsOld, wayAssetsNew)
+    } else {
+        await deleteDir(wayAssetsNew);
+        copyDir(wayAssetsOld, wayAssetsNew);
+    }
+  })
 }
 //-----------------------------------------------------------------from task5---get styles.css in DIST--------
 getStyles();
@@ -136,13 +146,3 @@ async function deleteDir(wayNew) {
   await fsProm.rm(wayNew, { recursive: true, force: true });
   fsProm.mkdir(wayNew, {recursive: true});
 }
-
-fs.access(wayAssetsNew, async (err) => { // is folder exist?
-  if (err && err.code === 'ENOENT') {
-    await fsProm.mkdir(wayAssetsNew, {recursive: true});
-    copyDir(wayAssetsOld, wayAssetsNew)
-  } else {
-      await deleteDir(wayAssetsNew);
-      copyDir(wayAssetsOld, wayAssetsNew);
-  }
-})
