@@ -36,7 +36,7 @@ async function readTemplate(obj) {
 async function findAllComponents() {
   let compObject = {};
   const components = await fsProm.readdir(wayComponents);
-  for (let item of components) {
+  for await (let item of components) {
     const st = await fsProm.stat(wayComponents + '/'+ item);
       if (st.isFile() && path.extname(item) === '.html') {
         let key =  path.basename(item, path.extname(item));
@@ -71,7 +71,7 @@ async function makeHTML() {
 async function readStylesDir() { // read DIR with styles
   let styleArray = [];
   const files = await fsProm.readdir(wayStyles); // all files in DIR here
-  for (let item of files) {
+  for await (let item of files) {
     const st = await fsProm.stat(wayStyles + '/'+ item) // get stats for each file in DIR
       if (st.isFile() && path.extname(item) === '.css') { // check is it .css file?
         const fileContent = await fsProm.readFile(wayStyles + '/' + item, {encoding: 'utf8'});
@@ -91,7 +91,7 @@ async function getAllStyles() {
 async function copyAssets(wayOld, wayNew) {
   await fsProm.mkdir(wayAssetsNew, {recursive: true});
   const files = await fsProm.readdir(wayOld);
-  for (let item of files) {
+  for await (let item of files) {
     const st = await fsProm.stat(wayOld + '/'+ item)
       if (st.isFile()) {
         await fsProm.copyFile(wayOld + '/' + item, wayNew + '/' + item)
