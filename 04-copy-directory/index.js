@@ -1,3 +1,30 @@
+// const fs = require('fs');
+// // const fsProm = require('fs/promises');
+// const path = require('path');
+
+// const wayNew = path.join(__dirname + '/files-copy');
+// const wayOld = path.join(__dirname + '/files');
+
+// const copyDir = async () => {
+//   fs.rm(wayNew, {recursive: true}, (err) => {
+
+//     if (err) {console.error(err.message);}
+
+//     fs.mkdir(wayNew, {recursive: true}, async ()=> {
+
+//       const files = fs.readdir(wayOld);
+//       for (let item of files) {
+//         fs.copyFile(wayOld + '/' + item, wayNew + '/' + item);
+//       }
+//       console.log(`${files.length} file(s) copied succesfully`);
+//     });
+//   });
+
+// };
+
+// copyDir();
+
+
 const fs = require('fs');
 const fsProm = require('fs/promises');
 const path = require('path');
